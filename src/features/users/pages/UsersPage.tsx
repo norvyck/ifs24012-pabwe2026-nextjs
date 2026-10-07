@@ -5,6 +5,8 @@ import { asyncGetUsers } from "../states/action";
 import { Mail, Shield, User, Search, Users, Sparkles } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { id as localeId } from "date-fns/locale";
+import type { UserProfile } from "@/types";
+import NextImage from "next/image";
 
 export default function UsersPage() {
   const dispatch = useAppDispatch();
@@ -15,19 +17,19 @@ export default function UsersPage() {
     dispatch(asyncGetUsers());
   }, [dispatch]);
 
-  const formatTime = (dateString: string) => {
+  const formatTime = (dateString?: string) => {
     try {
       if (!dateString) return "Waktu tidak diketahui";
       return formatDistanceToNow(new Date(dateString), { addSuffix: true, locale: localeId });
-    } catch (e) {
-      return dateString;
+    } catch {
+      return dateString ?? "Waktu tidak diketahui";
     }
   };
 
-  const filteredUsers = users?.filter((u: any) => 
+  const filteredUsers = users.filter((u: UserProfile) =>
     u.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
     u.email?.toLowerCase().includes(searchQuery.toLowerCase())
-  ) || [];
+  );
 
   return (
     <div className="mx-auto max-w-6xl py-2 sm:py-4">
@@ -63,13 +65,13 @@ export default function UsersPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {filteredUsers.map((u: any) => (
+          {filteredUsers.map((u) => (
             <article key={u.id} className="group relative flex flex-col items-center overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-6 text-center shadow-[0_8px_28px_-18px_rgba(15,23,42,0.22)] transition duration-300 hover:-translate-y-1 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-900/[0.07]">
               <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-br from-indigo-50 via-violet-50 to-white" />
               
               <div className="relative mb-4 mt-3">
                 {u.photo ? (
-                  <img src={u.photo} alt="" className="h-20 w-20 rounded-2xl object-cover ring-4 ring-white shadow-md" />
+                  <NextImage src={u.photo} alt="" width={80} height={80} unoptimized className="h-20 w-20 rounded-2xl object-cover ring-4 ring-white shadow-md" />
                 ) : (
                   <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-indigo-100 text-2xl font-bold text-indigo-700 ring-4 ring-white shadow-md">
                     {u.name?.charAt(0) || "U"}

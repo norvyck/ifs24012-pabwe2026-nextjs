@@ -8,10 +8,12 @@ import { LogOut, Settings, Camera, Mail, KeyRound, Shield, Edit3, X, Loader2 } f
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 import { showSuccessDialog, showErrorDialog } from "@/helpers/toolsHelper";
+import { getErrorMessage } from "@/helpers/apiHelper";
+import NextImage from "next/image";
 
 export default function ProfilePage() {
   const dispatch = useAppDispatch();
-  const profile: any = useAppSelector((state) => state.users.profile);
+  const profile = useAppSelector((state) => state.users.profile);
   const router = useRouter();
   
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -97,20 +99,20 @@ export default function ProfilePage() {
       await dispatch(asyncUpdateProfilePhoto(formData)).unwrap();
       showSuccessDialog("Berhasil", "Foto profil berhasil diperbarui!");
       dispatch(asyncGetProfile());
-    } catch (error: any) {
-      showErrorDialog("Gagal", error.message || "Gagal memperbarui foto profil");
+    } catch (error) {
+      showErrorDialog("Gagal", getErrorMessage(error, "Gagal memperbarui foto profil"));
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString?: string) => {
     try {
       if (!dateString) return "-";
       return format(new Date(dateString), "dd MMMM yyyy", { locale: localeId });
     } catch {
-      return dateString;
+      return dateString ?? "-";
     }
   };
 
@@ -143,11 +145,11 @@ export default function ProfilePage() {
               type="button"
               aria-label="Ubah foto profil"
               disabled={isUploading}
-              className="group relative cursor-pointer rounded-[1.35rem] text-left focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/30 disabled:cursor-wait"
+              className="group relative h-28 w-28 shrink-0 cursor-pointer rounded-[1.35rem] text-left focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/30 disabled:cursor-wait sm:h-32 sm:w-32"
               onClick={() => !isUploading && fileInputRef.current?.click()}
             >
               {profile?.photo ? (
-                <img src={profile.photo} alt="" className={`h-28 w-28 rounded-[1.35rem] object-cover ring-4 ring-white shadow-xl sm:h-32 sm:w-32 ${isUploading ? 'opacity-50' : ''}`} />
+                <NextImage src={profile.photo} alt="" fill unoptimized sizes="128px" className={`rounded-[1.35rem] object-cover ring-4 ring-white shadow-xl ${isUploading ? 'opacity-50' : ''}`} />
               ) : (
                 <div className={`flex h-28 w-28 items-center justify-center rounded-[1.35rem] bg-indigo-100 text-4xl font-bold text-indigo-700 ring-4 ring-white shadow-xl sm:h-32 sm:w-32 ${isUploading ? 'opacity-50' : ''}`}>
                   {profile?.name?.charAt(0) || "U"}
@@ -262,8 +264,8 @@ export default function ProfilePage() {
                   showSuccessDialog("Berhasil", "Profil berhasil diperbarui!");
                   dispatch(asyncGetProfile());
                   setIsEditOpen(false);
-                } catch (error: any) {
-                  showErrorDialog("Gagal", error.message || "Gagal memperbarui profil");
+                } catch (error) {
+                  showErrorDialog("Gagal", getErrorMessage(error, "Gagal memperbarui profil"));
                 } finally {
                   setIsEditLoading(false);
                 }

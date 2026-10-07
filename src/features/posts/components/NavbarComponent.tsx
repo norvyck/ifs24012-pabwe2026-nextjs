@@ -4,6 +4,7 @@ import { Bell, Menu, MessageSquare } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import NextImage from "next/image";
 
 export default function NavbarComponent({
   onMenuClick,
@@ -73,7 +74,7 @@ export default function NavbarComponent({
             <p className="max-w-40 truncate text-xs text-slate-400">{profile?.email || ""}</p>
           </div>
           {profile?.photo ? (
-            <img src={profile.photo} alt="" className="h-10 w-10 rounded-xl object-cover ring-2 ring-white shadow-sm" />
+            <NextImage src={profile.photo} alt="" width={40} height={40} unoptimized className="h-10 w-10 rounded-xl object-cover ring-2 ring-white shadow-sm" />
           ) : (
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-lime-200 text-sm font-bold text-slate-900 ring-2 ring-white shadow-sm">
               {profile?.name?.charAt(0) || "U"}

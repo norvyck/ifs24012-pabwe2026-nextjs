@@ -25,6 +25,7 @@ export interface PostComment {
   id: string | number;
   comment?: string;
   description?: string;
+  body?: string;
   author?: PostAuthor;
   created_at?: string;
   createdAt?: string;

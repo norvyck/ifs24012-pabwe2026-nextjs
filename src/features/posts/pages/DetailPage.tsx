@@ -9,10 +9,12 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { asyncToggleLike, asyncAddComment } from "../states/action";
 import { showSuccessDialog, showErrorDialog } from "@/helpers/toolsHelper";
+import { getErrorMessage } from "@/helpers/apiHelper";
+import NextImage from "next/image";
 
 export default function DetailPage({ postId }: { postId: string }) {
   const dispatch = useAppDispatch();
-  const post: any = useAppSelector((state) => state.posts.detail);
+  const post = useAppSelector((state) => state.posts.detail);
   const router = useRouter();
   
   const [commentText, setCommentText] = useState("");
@@ -23,6 +25,7 @@ export default function DetailPage({ postId }: { postId: string }) {
   }, [dispatch, postId]);
 
   const handleLike = async () => {
+    if (!post) return;
     await dispatch(asyncToggleLike({ id: postId, like: post.isLiked ? 0 : 1 }));
     dispatch(asyncGetPostDetail(postId));
   };
@@ -41,20 +44,20 @@ export default function DetailPage({ postId }: { postId: string }) {
       await dispatch(asyncAddComment({ id: postId, body: { comment: commentText } })).unwrap();
       showSuccessDialog("Berhasil", "Berhasil menambahkan komentar!");
       setCommentText("");
-    } catch (error: any) {
-      showErrorDialog("Gagal", error.message || "Gagal menambahkan komentar");
+    } catch (error) {
+      showErrorDialog("Gagal", getErrorMessage(error, "Gagal menambahkan komentar"));
     } finally {
       setIsSubmitting(false);
       dispatch(asyncGetPostDetail(postId));
     }
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString?: string) => {
     try {
       if (!dateString) return "Waktu tidak diketahui";
       return format(new Date(dateString), "dd MMMM yyyy, HH:mm", { locale: localeId });
     } catch {
-      return dateString;
+      return dateString ?? "Waktu tidak diketahui";
     }
   };
 
@@ -81,14 +84,14 @@ export default function DetailPage({ postId }: { postId: string }) {
       <article className="overflow-hidden rounded-[2rem] border border-slate-200/80 bg-white shadow-[0_16px_50px_-30px_rgba(15,23,42,0.25)]">
         {post.cover && (
           <div className="relative h-56 w-full bg-slate-100 sm:h-80 lg:h-[26rem]">
-            <img src={post.cover} alt="Sampul postingan" className="h-full w-full object-cover" />
+            <NextImage src={post.cover} alt="Sampul postingan" fill unoptimized sizes="100vw" className="object-cover" />
           </div>
         )}
         
         <div className="p-5 sm:p-8 lg:p-10">
           <div className="mb-7 flex items-center gap-3 border-b border-slate-100 pb-6 sm:mb-8 sm:gap-4 sm:pb-8">
             {post.author?.photo ? (
-              <img src={post.author.photo} alt="" className="h-12 w-12 rounded-2xl object-cover ring-2 ring-slate-100 sm:h-14 sm:w-14" />
+              <NextImage src={post.author.photo} alt="" width={56} height={56} unoptimized className="h-12 w-12 rounded-2xl object-cover ring-2 ring-slate-100 sm:h-14 sm:w-14" />
             ) : (
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-50 text-lg font-bold text-indigo-700 ring-2 ring-slate-100 sm:h-14 sm:w-14 sm:text-xl">
                 {post.author?.name?.charAt(0) || "U"}
@@ -165,10 +168,10 @@ export default function DetailPage({ postId }: { postId: string }) {
           {!post.comments || post.comments.length === 0 ? (
             <p className="rounded-2xl bg-slate-50 px-4 py-8 text-center text-sm text-slate-500">Belum ada komentar. Jadilah yang pertama berkomentar!</p>
           ) : (
-            post.comments.map((comment: any) => (
+            post.comments.map((comment) => (
               <div key={comment.id} className="flex gap-3 sm:gap-4">
                 {comment.author?.photo ? (
-                  <img src={comment.author.photo} alt="" className="h-10 w-10 shrink-0 rounded-xl object-cover ring-2 ring-slate-100" />
+                  <NextImage src={comment.author.photo} alt="" width={40} height={40} unoptimized className="h-10 w-10 shrink-0 rounded-xl object-cover ring-2 ring-slate-100" />
                 ) : (
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-500 ring-2 ring-slate-100">
                     <User className="h-5 w-5" aria-hidden="true" />

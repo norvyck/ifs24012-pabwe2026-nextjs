@@ -3,6 +3,8 @@ import { useState, useRef } from "react";
 import { X, Image as ImageIcon, Loader2, Upload } from "lucide-react";
 import { useAppDispatch } from "@/hooks/redux";
 import { asyncAddPost, asyncUpdatePostCover, asyncGetPosts } from "../states/action";
+import { getErrorMessage } from "@/helpers/apiHelper";
+import NextImage from "next/image";
 
 export default function AddPostModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const dispatch = useAppDispatch();
@@ -34,15 +36,13 @@ export default function AddPostModal({ isOpen, onClose }: { isOpen: boolean; onC
     
     setIsLoading(true);
     try {
-      // 1. Buat postingan dulu
       const result = await dispatch(asyncAddPost({ description })).unwrap();
-      console.log("addPost result:", JSON.stringify(result));
-      
-      // 2. Jika ada file cover, upload terpisah
-      // Coba beberapa kemungkinan path untuk ID
-      const postId = (result as any)?.data?.post?.id || (result as any)?.data?.id || (result as any)?.post?.id || (result as any)?.id;
-      
-      if (coverFile && postId) {
+      const postId = result?.data?.post_id;
+
+      if (coverFile) {
+        if (postId == null) {
+          throw new Error("API tidak mengembalikan ID postingan untuk mengunggah cover.");
+        }
         const formData = new FormData();
         formData.append("cover", coverFile);
         await dispatch(asyncUpdatePostCover({ id: String(postId), formData })).unwrap();
@@ -55,7 +55,7 @@ export default function AddPostModal({ isOpen, onClose }: { isOpen: boolean; onC
       onClose();
     } catch (error) {
       setIsLoading(false);
-      alert("Gagal menambahkan postingan. Silakan coba lagi.");
+      alert(getErrorMessage(error, "Gagal menambahkan postingan. Silakan coba lagi."));
     }
   };
 
@@ -115,8 +115,8 @@ export default function AddPostModal({ isOpen, onClose }: { isOpen: boolean; onC
                 <span className="text-xs text-slate-400">Format gambar yang didukung</span>
               </button>
             ) : (
-              <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-100">
-                <img src={coverPreview} alt="Pratinjau sampul" className="h-40 w-full object-cover" />
+              <div className="relative h-40 overflow-hidden rounded-2xl border border-slate-200 bg-slate-100">
+                <NextImage src={coverPreview} alt="Pratinjau sampul" fill unoptimized sizes="100vw" className="object-cover" />
                 <button
                   type="button"
                   aria-label="Hapus gambar"

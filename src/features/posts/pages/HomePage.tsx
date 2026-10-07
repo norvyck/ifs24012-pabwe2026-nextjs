@@ -8,6 +8,7 @@ import { formatDistanceToNow } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 import AddPostModal from "../components/AddPostModal";
 import type { Post } from "@/types";
+import NextImage from "next/image";
 
 export default function HomePage() {
   const dispatch = useAppDispatch();
@@ -124,7 +125,7 @@ export default function HomePage() {
                   <div className="mb-4 flex items-start justify-between">
                     <div className="flex min-w-0 items-center gap-3">
                       {post.author?.photo ? (
-                        <img src={post.author.photo} alt="" className="h-10 w-10 shrink-0 rounded-full object-cover ring-1 ring-slate-200" />
+                        <NextImage src={post.author.photo} alt="" width={40} height={40} unoptimized className="h-10 w-10 shrink-0 rounded-full object-cover ring-1 ring-slate-200" />
                       ) : (
                         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-violet-100 text-sm font-bold text-violet-800">
                           {post.author?.name?.charAt(0) || "U"}
@@ -169,7 +170,7 @@ export default function HomePage() {
 
                   {post.cover && (
                     <div className="mt-4 overflow-hidden rounded-xl bg-slate-100">
-                      <img src={post.cover} alt="Sampul postingan" className="max-h-[26rem] w-full object-cover transition-transform duration-500 group-hover:scale-[1.01]" />
+                      <NextImage src={post.cover} alt="Sampul postingan" width={1280} height={720} unoptimized className="max-h-[26rem] w-full object-cover transition-transform duration-500 group-hover:scale-[1.01]" />
                     </div>
                   )}
 
@@ -224,7 +225,7 @@ export default function HomePage() {
             <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Ruang personal</p>
             <div className="mt-3 flex items-center gap-3">
               {profile?.photo ? (
-                <img src={profile.photo} alt="" className="h-10 w-10 rounded-full object-cover" />
+                <NextImage src={profile.photo} alt="" width={40} height={40} unoptimized className="h-10 w-10 rounded-full object-cover" />
               ) : (
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-lime-200 text-sm font-bold text-slate-900">
                   {profile?.name?.charAt(0) || "U"}
