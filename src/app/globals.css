@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background: #f7f7f2;
+}
+
+body {
+  @apply min-h-screen text-slate-900 antialiased;
+  background:
+    radial-gradient(ellipse at 0% 0%, rgb(217 249 157 / 0.2), transparent 30rem),
+    radial-gradient(ellipse at 100% 18%, rgb(221 214 254 / 0.22), transparent 34rem),
+    #f7f7f2;
+}
+
+::selection {
+  color: #172554;
+  background: #d9f99d;
+}

@@ -1,0 +1,1 @@
+export default function ChangeCoverModal() { return <div>Change Cover Modal Placeholder</div>; }
